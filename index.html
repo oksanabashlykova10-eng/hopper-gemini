@@ -2,363 +2,361 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Leap and Learn - Ultra Editor</title>
+    <title>Leap and Learn Editor PRO</title>
     <style>
-        :root { --accent: #7cf9ff; --bg: #0b1630; --panel: #16213e; }
+        :root { --accent: #7cf9ff; --bg: #0b1630; --panel: #16213e; --danger: #ff4757; }
         body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; background: var(--bg); color: white; overflow: hidden; }
         
         /* Sidebar */
-        #sidebar { width: 450px; background: var(--panel); padding: 20px; overflow-y: auto; border-right: 2px solid var(--accent); box-shadow: 10px 0 20px rgba(0,0,0,0.5); z-index: 10; }
+        #sidebar { width: 420px; background: var(--panel); padding: 20px; overflow-y: auto; border-right: 2px solid var(--accent); box-shadow: 10px 0 20px rgba(0,0,0,0.5); z-index: 10; }
         .section { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(124,249,255,0.1); }
-        h3 { margin-top: 0; color: var(--accent); font-size: 16px; text-transform: uppercase; border-bottom: 1px solid var(--accent); padding-bottom: 5px; }
+        h3 { margin-top: 0; color: var(--accent); font-size: 14px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(124,249,255,0.3); padding-bottom: 5px; margin-bottom: 15px; }
         
-        label { display: block; margin: 12px 0 5px; font-size: 13px; opacity: 0.9; }
+        label { display: block; margin: 10px 0 5px; font-size: 12px; font-weight: bold; color: var(--accent); }
         input[type="color"], input[type="text"], input[type="number"], select { 
-            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(124,249,255,0.3); 
-            background: #0f3460; color: white; box-sizing: border-box;
+            width: 100%; padding: 8px; border-radius: 6px; border: 1px solid rgba(124,249,255,0.3); 
+            background: #0f3460; color: white; box-sizing: border-box; margin-bottom: 5px;
         }
         
-        .flex-row { display: flex; gap: 10px; align-items: center; }
         .btn { 
-            background: var(--accent); color: #000; border: none; padding: 12px; 
-            border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s;
+            background: var(--accent); color: #000; border: none; padding: 10px; 
+            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.2s;
         }
-        .btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
-        .btn-edit { width: auto; padding: 5px 10px; background: #ffe44d; }
+        .btn:hover { filter: brightness(1.2); }
+        .btn-danger { background: var(--danger); color: white; width: auto; padding: 5px 10px; }
 
-        /* Level Item */
-        .level-item { 
-            background: rgba(0,0,0,0.3); padding: 10px; margin: 10px 0; border-radius: 8px; 
-            display: flex; justify-content: space-between; align-items: center; border: 1px dashed var(--accent);
+        /* Level Management */
+        .level-card { 
+            background: rgba(0,0,0,0.2); padding: 10px; margin: 8px 0; border-radius: 8px; 
+            display: flex; gap: 8px; align-items: center; border: 1px solid rgba(124,249,255,0.2);
         }
+        .level-info { flex-grow: 1; font-size: 14px; }
 
-        /* Modal Question Editor */
-        #modal { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); 
-            z-index: 100; align-items: center; justify-content: center; 
-        }
-        .modal-content { 
-            background: var(--panel); width: 90%; max-width: 600px; max-height: 80vh; 
-            overflow-y: auto; padding: 30px; border-radius: 20px; border: 2px solid var(--accent);
-        }
+        /* Modal */
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100; align-items: center; justify-content: center; }
+        .modal-content { background: var(--panel); width: 90%; max-width: 700px; max-height: 85vh; overflow-y: auto; padding: 25px; border-radius: 15px; border: 2px solid var(--accent); }
 
         /* Preview Area */
         #preview-container { flex-grow: 1; display: flex; flex-direction: column; background: #000; }
-        #game-frame { width: 100%; height: 100%; border: none; }
-        .top-bar { padding: 15px; background: #0f3460; display: flex; justify-content: space-between; align-items: center; }
+        #game-frame { width: 100%; height: 100%; border: none; background: #fff; }
+        .top-bar { padding: 10px 20px; background: #0f3460; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--accent); }
+        
+        .upload-btn { font-size: 10px; color: var(--accent); cursor: pointer; text-decoration: underline; display: block; margin-top: 4px; }
     </style>
 </head>
 <body>
 
 <div id="sidebar">
-    <h2 style="color:var(--accent)">🚀 Leap & Learn Editor</h2>
+    <h2 style="color:var(--accent); text-align:center;">🐸 Leap & Learn Editor</h2>
     
     <div class="section">
-        <h3>🎨 Локация и Герой</h3>
-        <label>Фон игры</label>
-        <select id="bgSelect" onchange="updatePreview()">
-            <option value="https://img.genially.com/67961b32a116fb001568a75e/c0c9010f-c3dd-42c1-b7c1-65024fa3aec6.png">Река</option>
-            <option value="https://img.genially.com/67961b32a116fb001568a75e/fa2ab459-fec9-4ccd-97e3-254427b4ade0.png">Лава</option>
-            <option value="https://img.genially.com/67961b32a116fb001568a75e/02b52ad4-9d31-4b21-a305-8fec6e8a4487.png">Болото</option>
+        <h3>📍 Локация и Платформы</h3>
+        <label>Фон (Река/Лава/Болото или Свой URL)</label>
+        <select id="bgSelect" onchange="toggleCustom('bg')">
+            <option value="https://img.genially.com/67961b32a116fb001568a75e/c0c9010f-c3dd-42c1-b7c1-65024fa3aec6.png">Река (Синий)</option>
+            <option value="https://img.genially.com/67961b32a116fb001568a75e/fa2ab459-fec9-4ccd-97e3-254427b4ade0.png">Лава (Красный)</option>
+            <option value="https://img.genially.com/67961b32a116fb001568a75e/02b52ad4-9d31-4b21-a305-8fec6e8a4487.png">Болото (Зеленый)</option>
+            <option value="custom">Своя ссылка...</option>
         </select>
-        <label>Персонаж</label>
-        <select id="charSelect" onchange="updatePreview()">
+        <input type="text" id="bgCustom" placeholder="Вставьте URL фона" style="display:none" oninput="updatePreview()">
+        <input type="file" id="bgFile" style="display:none" onchange="handleFileUpload(this, 'bgCustom')">
+        <span class="upload-btn" onclick="document.getElementById('bgFile').click()">Загрузить свой файл</span>
+
+        <label>Платформа</label>
+        <select id="platSelect" onchange="toggleCustom('plat')">
+            <option value="https://img.genially.com/67961b32a116fb001568a75e/ed6c6e82-953b-43d4-947d-e46227b760f0.png">Лилия</option>
+            <option value="custom">Своя ссылка...</option>
+        </select>
+        <input type="text" id="platCustom" placeholder="URL платформы" style="display:none" oninput="updatePreview()">
+    </div>
+
+    <div class="section">
+        <h3>🎭 Персонаж и Интерфейс</h3>
+        <label>Герой</label>
+        <select id="charSelect" onchange="toggleCustom('char')">
             <option value="https://img.genially.com/67961b32a116fb001568a75e/3074df22-5c73-4ad2-b0b2-491c6fc247f3.png">Лягушка</option>
             <option value="https://img.genially.com/67961b32a116fb001568a75e/74b56fcf-5354-43dd-9c9a-f50facc9a9bf.png">Хамелеон</option>
             <option value="https://img.genially.com/67961b32a116fb001568a75e/0feda2a1-485a-4654-8640-bf1adcc9f9ec.png">Ящерица</option>
+            <option value="custom">Свой URL...</option>
         </select>
-        <label>Платформа</label>
-        <select id="platformSelect" onchange="updatePreview()">
-            <option value="https://img.genially.com/67961b32a116fb001568a75e/ed6c6e82-953b-43d4-947d-e46227b760f0.png">Кувшинка</option>
-            <option value="https://via.placeholder.com/150?text=Stone">Камень (URL)</option>
-            <option value="https://via.placeholder.com/150?text=Bump">Кочка (URL)</option>
-        </select>
-    </div>
+        <input type="text" id="charCustom" placeholder="URL героя" style="display:none" oninput="updatePreview()">
 
-    <div class="section">
-        <h3>🌈 Цвета и Интерфейс</h3>
-        <div class="flex-row">
-            <div><label>Старт. экран</label><input type="color" id="startColor" value="#081022" onchange="updatePreview()"></div>
-            <div><label>Фин. экран</label><input type="color" id="endColor" value="#081022" onchange="updatePreview()"></div>
-        </div>
-        <label>Цвет панелей и Таймера</label>
-        <input type="color" id="uiColor" value="#7cf9ff" onchange="updatePreview()">
-        <label><input type="checkbox" id="neonGlow" checked onchange="updatePreview()"> Неоновая подсветка</label>
-        
-        <label>Шрифт (цвет и размер)</label>
-        <div class="flex-row">
-            <input type="color" id="fontColor" value="#eaf6ff" onchange="updatePreview()">
-            <input type="number" id="fontSize" value="26" onchange="updatePreview()">
+        <label>Цвет панелей и таймера</label>
+        <div style="display:flex; gap:5px">
+            <input type="color" id="uiColor" value="#7cf9ff" onchange="updatePreview()">
+            <label style="margin:0; display:flex; align-items:center; gap:5px"><input type="checkbox" id="neonGlow" checked onchange="updatePreview()"> Неон</label>
         </div>
     </div>
 
     <div class="section">
-        <h3>📢 Фидбек и Звуки</h3>
-        <label>Текст победы / Провала</label>
-        <input type="text" id="winMsg" value="ВЕЛИКОЛЕПНО!" oninput="updatePreview()">
-        <input type="text" id="loseMsg" value="НЕ ПОВЕЗЛО..." oninput="updatePreview()">
-        
-        <p style="font-size:10px; opacity:0.6">* Вставьте URL своих .mp3 файлов для звуков</p>
-        <label>Звук верного ответа</label>
-        <input type="text" id="soundOk" placeholder="URL звука" oninput="updatePreview()">
+        <h3>💬 Тексты и Финалы</h3>
+        <label>Победа / Провал</label>
+        <input type="text" id="winMsg" value="УРОВЕНЬ ПРОЙДЕН" oninput="updatePreview()">
+        <input type="text" id="loseMsg" value="ИГРА ОКОНЧЕНА" oninput="updatePreview()">
+        <label>Размер шрифта</label>
+        <input type="number" id="fontSize" value="26" oninput="updatePreview()">
     </div>
 
     <div class="section">
         <h3>🎮 Уровни (Сложность: <span id="timerVal">10</span>с)</h3>
-        <input type="range" min="3" max="20" value="10" id="timeSlider" oninput="timerVal.textContent=this.value; updatePreview()">
-        <div id="levelContainer"></div>
-        <button class="btn" style="background:#4ecca3" onclick="addLevel()">+ Добавить уровень</button>
+        <input type="range" min="3" max="15" value="10" id="timeSlider" oninput="timerVal.textContent=this.value; updatePreview()">
+        <div id="levelList"></div>
+        <button class="btn" style="background:#4ecca3; margin-top:10px" onclick="addLevel()">+ Добавить уровень</button>
     </div>
 </div>
 
 <div id="preview-container">
     <div class="top-bar">
-        <span>LIVE PREVIEW: Leap and Learn</span>
-        <button class="btn" style="width:auto" onclick="exportCode()">СКОПИРОВАТЬ КОД ДЛЯ GITHUB</button>
+        <span>Предпросмотр (Leap & Learn)</span>
+        <button class="btn" style="width:auto; background:white; color:black" onclick="copyGitHubCode()">СКОПИРОВАТЬ КОД ДЛЯ GITHUB</button>
     </div>
     <iframe id="game-frame"></iframe>
 </div>
 
 <div id="modal">
     <div class="modal-content">
-        <h2 id="modalTitle">Редактор вопросов</h2>
-        <div id="questionsList"></div>
-        <button class="btn" style="margin-top:10px" onclick="addQuestion()">+ Добавить вопрос</button>
-        <button class="btn" style="margin-top:20px; background:#ff3b3b; color:white" onclick="closeModal()">СОХРАНИТЬ И ЗАКРЫТЬ</button>
+        <h2 id="modalTitle" style="color:var(--accent)">Редактор вопросов</h2>
+        <div id="qList"></div>
+        <button class="btn" style="margin-top:10px; background:#4ecca3" onclick="addQuestion()">+ Добавить вопрос</button>
+        <button class="btn" style="margin-top:20px; background:var(--accent); color:#000" onclick="closeModal()">СОХРАНИТЬ</button>
     </div>
 </div>
 
 <script>
-    // Изначальные данные
-    let currentLevelIndex = 0;
-    let data = {
+    let currentLvlIdx = 0;
+    let gameData = {
         levels: [
-            {
-                name: "Уровень 1",
-                questions: [
-                    {text: "I ____ ready.", answers: ["am", "is", "are"], correct: 0},
-                    {text: "She ____ a cat.", answers: ["have", "has", "is"], correct: 1}
-                ]
-            }
+            { name: "Уровень 1", questions: [{text: "I ____ ready.", answers: ["am","is","are"], correct: 0}] }
         ]
     };
 
+    function toggleCustom(id) {
+        const select = document.getElementById(id + 'Select');
+        const custom = document.getElementById(id + 'Custom');
+        custom.style.display = select.value === 'custom' ? 'block' : 'none';
+        updatePreview();
+    }
+
+    function handleFileUpload(input, targetId) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById(targetId).value = e.target.result;
+            updatePreview();
+        };
+        reader.readAsDataURL(file);
+    }
+
     function addLevel() {
-        data.levels.push({
-            name: "Уровень " + (data.levels.length + 1),
-            questions: [{text: "Новый вопрос?", answers: ["Ответ 1", "Ответ 2", "Ответ 3"], correct: 0}]
+        gameData.levels.push({
+            name: "Уровень " + (gameData.levels.length + 1),
+            questions: [{text: "Новый вопрос", answers: ["Ответ 1","Ответ 2","Ответ 3"], correct: 0}]
         });
         renderLevels();
         updatePreview();
     }
 
+    function deleteLevel(idx) {
+        if(gameData.levels.length > 1) {
+            gameData.levels.splice(idx, 1);
+            renderLevels();
+            updatePreview();
+        } else { alert("Должен быть хотя бы один уровень!"); }
+    }
+
     function renderLevels() {
-        const container = document.getElementById('levelContainer');
-        container.innerHTML = data.levels.map((l, i) => `
-            <div class="level-item">
-                <span><b>${l.name}</b> (${l.questions.length} вопр.)</span>
-                <button class="btn btn-edit" onclick="openModal(${i})">⚙️ Вопросы</button>
+        const container = document.getElementById('levelList');
+        container.innerHTML = gameData.levels.map((l, i) => `
+            <div class="level-card">
+                <div class="level-info"><b>${l.name}</b> (${l.questions.length} в.)</div>
+                <button class="btn" style="width:auto; padding:5px" onclick="openModal(${i})">⚙️</button>
+                <button class="btn-danger" onclick="deleteLevel(${i})">🗑️</button>
             </div>
         `).join('');
     }
 
-    // Модальное окно логика
     function openModal(idx) {
-        currentLevelIndex = idx;
+        currentLvlIdx = idx;
         document.getElementById('modal').style.display = 'flex';
-        document.getElementById('modalTitle').textContent = "Редактирование: " + data.levels[idx].name;
         renderQuestions();
     }
 
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-        renderLevels();
-        updatePreview();
-    }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; renderLevels(); updatePreview(); }
 
     function renderQuestions() {
-        const list = document.getElementById('questionsList');
-        const qData = data.levels[currentLevelIndex].questions;
-        list.innerHTML = qData.map((q, i) => `
+        const container = document.getElementById('qList');
+        const qs = gameData.levels[currentLvlIdx].questions;
+        container.innerHTML = qs.map((q, i) => `
             <div style="background:rgba(255,255,255,0.05); padding:10px; margin-bottom:10px; border-radius:10px">
-                <label>Вопрос ${i+1}</label>
-                <input type="text" value="${q.text}" oninput="data.levels[${currentLevelIndex}].questions[${i}].text = this.value">
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px; margin-top:5px">
-                    ${q.answers.map((ans, ai) => `
-                        <input type="text" value="${ans}" placeholder="Ответ ${ai+1}" 
-                               oninput="data.levels[${currentLevelIndex}].questions[${i}].answers[${ai}] = this.value">
-                    `).join('')}
+                <input type="text" value="${q.text}" placeholder="Вопрос" oninput="gameData.levels[${currentLvlIdx}].questions[${i}].text=this.value">
+                <div style="display:flex; gap:5px; margin-top:5px">
+                    ${q.answers.map((a, ai) => `<input type="text" value="${a}" oninput="gameData.levels[${currentLvlIdx}].questions[${i}].answers[${ai}]=this.value">`).join('')}
                 </div>
-                <label>Индекс правильного (0, 1 или 2): 
-                    <input type="number" min="0" max="2" value="${q.correct}" style="width:50px"
-                           oninput="data.levels[${currentLevelIndex}].questions[${i}].correct = parseInt(this.value)">
-                </label>
+                <select onchange="gameData.levels[${currentLvlIdx}].questions[${i}].correct=parseInt(this.value)">
+                    <option value="0" ${q.correct==0?'selected':''}>Верный: 1</option>
+                    <option value="1" ${q.correct==1?'selected':''}>Верный: 2</option>
+                    <option value="2" ${q.correct==2?'selected':''}>Верный: 3</option>
+                </select>
+                <button class="upload-btn" style="color:red; border:none; background:none" onclick="gameData.levels[${currentLvlIdx}].questions.splice(${i},1); renderQuestions()">Удалить вопрос</button>
             </div>
         `).join('');
     }
 
     function addQuestion() {
-        data.levels[currentLevelIndex].questions.push({text: "Новый вопрос", answers: ["1", "2", "3"], correct: 0});
+        gameData.levels[currentLvlIdx].questions.push({text: "", answers: ["","",""], correct: 0});
         renderQuestions();
     }
 
-    // ГЕНЕРАЦИЯ ПРЕВЬЮ
     function updatePreview() {
         const frame = document.getElementById('game-frame');
-        
-        // Сбор настроек из UI
-        const config = {
-            bg: document.getElementById('bgSelect').value,
-            char: document.getElementById('charSelect').value,
-            plat: document.getElementById('platformSelect').value,
-            uiColor: document.getElementById('uiColor').value,
-            neon: document.getElementById('neonGlow').checked,
-            fontColor: document.getElementById('fontColor').value,
-            fontSize: document.getElementById('fontSize').value,
-            startBg: document.getElementById('startColor').value,
-            endBg: document.getElementById('endColor').value,
-            winT: document.getElementById('winMsg').value,
-            loseT: document.getElementById('loseMsg').value,
-            time: document.getElementById('timeSlider').value,
-            levels: data.levels
+        const getVal = (id) => {
+            const s = document.getElementById(id+'Select');
+            const c = document.getElementById(id+'Custom');
+            return s.value === 'custom' ? c.value : s.value;
         };
 
-        // Формируем полный HTML-код игры (основан на твоем коде)
-        const fullCode = `
+        const config = {
+            bg: getVal('bg'),
+            char: getVal('char'),
+            plat: getVal('plat'),
+            ui: document.getElementById('uiColor').value,
+            neon: document.getElementById('neonGlow').checked,
+            win: document.getElementById('winMsg').value,
+            lose: document.getElementById('loseMsg').value,
+            fSize: document.getElementById('fontSize').value,
+            time: document.getElementById('timeSlider').value,
+            levels: gameData.levels
+        };
+
+        // Вставляем оригинальный код игры с подстановкой переменных
+        const finalHTML = `
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <style>
-        :root { 
-            --neon-main: ${config.uiColor}; 
-            --bg-start: ${config.startBg};
-            --bg-end: ${config.endBg};
-        }
-        body { margin:0; overflow:hidden; font-family:Arial; background:#000; color: ${config.fontColor}; font-size: ${config.fontSize}px; }
-        #BG { position:absolute; inset:0; background:url("${config.bg}") center/cover no-repeat; z-index:0; }
-        #QUESTION { position:absolute; top:30px; width:100%; text-align:center; z-index:20; text-shadow:2px 2px 4px #000; }
-        #TIMER { 
-            position:absolute; top:80px; left:50%; transform:translateX(-50%); 
-            width:70px; height:70px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-            background:rgba(0,0,0,0.5); border:3px solid var(--neon-main); 
-            box-shadow: ${config.neon ? '0 0 20px var(--neon-main)' : 'none'};
-            font-weight:bold; z-index:20;
-        }
-        .btn { 
-            padding:15px 30px; background:var(--neon-main); border:none; border-radius:10px; 
-            cursor:pointer; font-weight:bold; box-shadow: ${config.neon ? '0 0 15px var(--neon-main)' : 'none'};
-        }
-        #START_SCREEN { position:absolute; inset:0; z-index:100; background:var(--bg-start); display:flex; flex-direction:column; align-items:center; justify-content:center; }
-        #END_SCREEN { position:absolute; inset:0; z-index:100; background:var(--bg-end); display:none; flex-direction:column; align-items:center; justify-content:center; }
-        #FROG { 
-            position:absolute; left:150px; bottom:20%; width:100px; height:100px; 
-            background:url("${config.char}") no-repeat center/contain; z-index:15; transition: 0.5s;
-        }
-        .lily { 
-            position:absolute; width:140px; height:140px; 
-            background:url("${config.plat}") no-repeat center/contain;
-            display:flex; align-items:center; justify-content:center; color:#000; font-weight:bold; cursor:pointer;
-        }
+        :root { --neon-main: ${config.ui}; --danger: #ff3b3b; --win: #ffe44d; }
+        html,body { margin:0; width:100%; height:100%; overflow:hidden; font-family:Arial; background:#000; }
+        #GAME { position:relative; width:100%; height:100%; }
+        #GAME.shake { animation: shake .25s; }
+        @keyframes shake { 0%{transform:translate(0)} 25%{transform:translate(-4px,3px)} 50%{transform:translate(4px,-3px)} 75%{transform:translate(-3px,2px)} 100%{transform:translate(0)} }
+        #BG { position:absolute; inset:0; z-index:0; background:url("${config.bg}") center/cover no-repeat; }
+        #QUESTION { position:absolute; top:26px; width:100%; text-align:center; font-size:${config.fSize}px; z-index:20; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.8); }
+        #TIMER { position:absolute; top:70px; left:50%; transform:translateX(-50%); width:80px; height:80px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.6); border:2px solid var(--neon-main); box-shadow: ${config.neon ? '0 0 18px var(--neon-main)' : 'none'}; z-index:20; font-weight:900; color:#fff; }
+        #SCORE { position:absolute; top:30px; left:30px; font-size:20px; font-weight:900; z-index:20; color:#fff; }
+        .btn { padding:12px 34px; border-radius:16px; font-weight:900; background:#fff; border:2px solid var(--neon-main); cursor:pointer; color:#000; }
+        #START_SCREEN { position:absolute; inset:0; z-index:60; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.8); }
+        #END { position:absolute; inset:0; z-index:50; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; flex-direction:column; }
+        #FROG { position:absolute; left:160px; top:50%; width:110px; height:110px; background:url("${config.char}") no-repeat center/contain; transform:translate(-50%,-65%); z-index:15; transition:transform .6s ease,opacity .6s ease; }
         #PLATFORMS { position:absolute; inset:0; z-index:10; }
+        .platform { position:absolute; width:150px; height:150px; transition:transform .5s; }
+        .lily { width:150px; height:150px; background:url("${config.plat}") no-repeat center/contain; display:flex; align-items:center; justify-content:center; font-weight:900; color:#000; }
+        .platform.answer { cursor:pointer; }
+        .splash { position:absolute; width:90px; height:34px; background:rgba(255,255,255,0.8); border-radius:50%; animation:splash .45s forwards; }
+        @keyframes splash { to { transform:scale(2); opacity:0; } }
     </style>
 </head>
 <body>
     <div id="GAME">
         <div id="BG"></div>
-        <div id="START_SCREEN">
-            <h1>Leap & Learn</h1>
-            <button class="btn" onclick="startGame()">▶ ИГРАТЬ</button>
-        </div>
-        <div id="END_SCREEN">
-            <h1 id="RES_TEXT"></h1>
-            <button class="btn" onclick="location.reload()">🔄 ЗАНОГО</button>
-        </div>
-        <div id="UI" style="display:none">
-            <div id="QUESTION"></div>
-            <div id="TIMER"></div>
-            <div id="SCORE" style="position:absolute; top:20px; left:20px; z-index:20">⭐ 0</div>
-        </div>
+        <div id="SCORE">⭐ 0</div>
+        <div id="QUESTION"></div>
+        <div id="TIMER"></div>
         <div id="FROG"></div>
         <div id="PLATFORMS"></div>
+        
+        <div id="START_SCREEN">
+            <button class="btn" onclick="startGame()">НАЧАТЬ ИГРУ</button>
+        </div>
+
+        <div id="END">
+            <h1 id="END_TEXT" style="color:white; text-align:center;"></h1>
+            <button class="btn" onclick="location.reload()">ИГРАТЬ СНОВА</button>
+        </div>
     </div>
 
     <script>
-        const CONFIG = ${JSON.stringify(config)};
-        let curLvl = 0, curQ = 0, score = 0, timer, time;
+        const LEVELS = ${JSON.stringify(config.levels)};
+        let curLvl = 0, curQ = 0, score = 0, timer, timeLeft;
 
         function startGame() {
             document.getElementById('START_SCREEN').style.display = 'none';
-            document.getElementById('UI').style.display = 'block';
             loadQuestion();
         }
 
         function loadQuestion() {
-            const level = CONFIG.levels[curLvl];
-            const q = level.questions[curQ];
+            const q = LEVELS[curLvl].questions[curQ];
             document.getElementById('QUESTION').textContent = q.text;
-            
-            const container = document.getElementById('PLATFORMS');
-            container.innerHTML = "";
-            
+            renderPlatforms(q);
+            startTimer();
+        }
+
+        function renderPlatforms(q) {
+            const pDiv = document.getElementById('PLATFORMS');
+            pDiv.innerHTML = "";
+            const STEP = 200;
             q.answers.forEach((ans, i) => {
                 const d = document.createElement('div');
-                d.className = 'lily';
-                d.style.left = (300 + i*200) + 'px';
-                d.style.bottom = '20%';
-                d.textContent = ans;
-                d.onclick = () => check(i);
-                container.appendChild(d);
+                d.className = 'platform answer';
+                d.style.left = (400 + i * STEP) + 'px';
+                d.style.top = (window.innerHeight/2 - 75) + 'px';
+                d.innerHTML = '<div class="lily">' + ans + '</div>';
+                d.onclick = () => check(i, d.offsetLeft);
+                pDiv.appendChild(d);
+            });
+        }
+
+        function check(idx, x) {
+            clearInterval(timer);
+            const frog = document.getElementById('FROG');
+            const targetX = 160;
+            const shift = x - targetX + 75;
+
+            // Анимация прыжка
+            document.querySelectorAll('.platform').forEach(p => {
+                p.style.transform = "translateX(-" + shift + "px)";
             });
 
-            time = CONFIG.time;
-            document.getElementById('TIMER').textContent = time;
+            setTimeout(() => {
+                if(idx === LEVELS[curLvl].questions[curQ].correct) {
+                    score += 100;
+                    document.getElementById('SCORE').textContent = "⭐ " + score;
+                    curQ++;
+                    if(curQ >= LEVELS[curLvl].questions.length) {
+                        curLvl++; curQ = 0;
+                        if(curLvl >= LEVELS.length) return end(true);
+                    }
+                    loadQuestion();
+                } else { end(false); }
+            }, 600);
+        }
+
+        function startTimer() {
+            timeLeft = ${config.time};
+            document.getElementById('TIMER').textContent = timeLeft;
             clearInterval(timer);
             timer = setInterval(() => {
-                time--;
-                document.getElementById('TIMER').textContent = time;
-                if(time <= 0) { clearInterval(timer); fail(); }
+                timeLeft--;
+                document.getElementById('TIMER').textContent = timeLeft;
+                if(timeLeft <= 0) end(false);
             }, 1000);
         }
 
-        function check(idx) {
-            if(idx === CONFIG.levels[curLvl].questions[curQ].correct) {
-                score += 100;
-                document.getElementById('SCORE').textContent = "⭐ " + score;
-                curQ++;
-                if(curQ >= CONFIG.levels[curLvl].questions.length) {
-                    curLvl++; curQ = 0;
-                    if(curLvl >= CONFIG.levels.length) return win();
-                }
-                loadQuestion();
-            } else { fail(); }
-        }
-
-        function win() {
-            document.getElementById('END_SCREEN').style.display = 'flex';
-            document.getElementById('RES_TEXT').textContent = CONFIG.winT;
-            document.getElementById('RES_TEXT').style.color = "yellow";
-        }
-
-        function fail() {
-            document.getElementById('END_SCREEN').style.display = 'flex';
-            document.getElementById('RES_TEXT').textContent = CONFIG.loseT;
-            document.getElementById('RES_TEXT').style.color = "red";
+        function end(win) {
+            document.getElementById('END').style.display = 'flex';
+            document.getElementById('END_TEXT').textContent = win ? "${config.win}" : "${config.lose}";
         }
     <\/script>
 </body>
 </html>`;
-
-        frame.srcdoc = fullCode;
+        frame.srcdoc = finalHTML;
     }
 
-    function exportCode() {
-        const code = document.getElementById('game-frame').srcdoc;
-        navigator.clipboard.writeText(code);
-        alert("Код игры скопирован! Теперь создай файл index.html в GitHub и вставь его туда.");
+    function copyGitHubCode() {
+        navigator.clipboard.writeText(document.getElementById('game-frame').srcdoc);
+        alert("Код скопирован! Вставь его в файл index.html на GitHub.");
     }
 
-    // Старт
     renderLevels();
     updatePreview();
 </script>
